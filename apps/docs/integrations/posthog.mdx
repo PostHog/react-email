@@ -1,0 +1,90 @@
+---
+title: "Send email using PostHog"
+sidebarTitle: "PostHog"
+description: "Learn how to send an email using React Email and the PostHog Node.js SDK."
+"og:image": "https://react.email/static/covers/react-email.png"
+---
+
+## 1. Install dependencies
+
+Get the [react-email](https://www.npmjs.com/package/react-email) package and the [PostHog Node.js SDK](https://www.npmjs.com/package/posthog-node).
+
+<CodeGroup>
+
+```sh npm
+npm install posthog-node react-email
+```
+
+```sh yarn
+yarn add posthog-node react-email
+```
+
+```sh pnpm
+pnpm add posthog-node react-email
+```
+
+```sh bun
+bun add posthog-node react-email
+```
+
+</CodeGroup>
+
+## 2. Create an email using React
+
+Start by building your email template in a `.jsx` or `.tsx` file.
+
+```tsx email.tsx
+import { Button, Html } from "react-email";
+
+interface EmailProps {
+  url: string;
+}
+
+export function Email({ url }: EmailProps) {
+  return (
+    <Html lang="en">
+      <Button href={url}>Click me</Button>
+    </Html>
+  );
+}
+```
+
+## 3. Convert to HTML and send email
+
+Import the email template you just built, convert it into an HTML string and a plain text version, and use the PostHog SDK to send both. The SDK needs a [project secret API key](https://posthog.com/docs/workflows/transactional-emails#create-an-api-key) with the transactional email scope.
+
+```tsx
+import { PostHog } from "posthog-node";
+import { render, toPlainText } from "react-email";
+import { Email } from "./email";
+
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+  host: "https://us.i.posthog.com",
+  secretKey: process.env.POSTHOG_PROJECT_SECRET_API_KEY,
+  enableLocalEvaluation: false,
+});
+
+const emailHtml = await render(<Email url="https://example.com" />);
+
+const { data, error } = await posthog.emails.send({
+  from: "you@example.com",
+  to: "user@gmail.com",
+  subject: "hello world",
+  templateKey: "hello-world",
+  html: emailHtml,
+  text: toPlainText(emailHtml),
+});
+```
+
+`templateKey` names the email, so PostHog groups its sends and metrics. The `from` address must be on a domain that your PostHog project verified. See the [PostHog React Email guide](https://posthog.com/docs/workflows/transactional-emails/react-email) for retries and errors.
+
+## Try it yourself
+
+<Card
+  title="PostHog example"
+  icon="arrow-up-right-from-square"
+  iconType="duotone"
+  href="https://github.com/resend/react-email/tree/main/examples/posthog"
+>
+  See the full source code.
+</Card>
