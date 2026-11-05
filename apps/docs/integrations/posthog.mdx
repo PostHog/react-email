@@ -58,7 +58,7 @@ import { PostHog } from "posthog-node";
 import { render, toPlainText } from "react-email";
 import { Email } from "./email";
 
-const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN, {
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN || "", {
   host: "https://us.i.posthog.com",
   secretKey: process.env.POSTHOG_PROJECT_SECRET_API_KEY,
   enableLocalEvaluation: false,
@@ -74,6 +74,12 @@ const { data, error } = await posthog.emails.send({
   html: emailHtml,
   text: toPlainText(emailHtml),
 });
+
+if (error) {
+  throw error;
+}
+
+console.log(data.id);
 ```
 
 `templateKey` names the email, so PostHog groups its sends and metrics. The `from` address must be on a domain that your PostHog project verified. See the [PostHog React Email guide](https://posthog.com/docs/workflows/transactional-emails/react-email) for retries and errors.
