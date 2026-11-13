@@ -7,24 +7,24 @@ description: "Learn how to send an email using React Email and the PostHog Node.
 
 ## 1. Install dependencies
 
-Get the [react-email](https://www.npmjs.com/package/react-email) package and the [PostHog Node.js SDK](https://www.npmjs.com/package/posthog-node).
+Get the [react-email](https://www.npmjs.com/package/react-email) package, the [PostHog Node.js SDK](https://www.npmjs.com/package/posthog-node), and [@react-email/render](https://www.npmjs.com/package/@react-email/render). The SDK renders the email with `@react-email/render`, an optional peer dependency, so install it by name.
 
 <CodeGroup>
 
 ```sh npm
-npm install posthog-node react-email
+npm install posthog-node @react-email/render react-email
 ```
 
 ```sh yarn
-yarn add posthog-node react-email
+yarn add posthog-node @react-email/render react-email
 ```
 
 ```sh pnpm
-pnpm add posthog-node react-email
+pnpm add posthog-node @react-email/render react-email
 ```
 
 ```sh bun
-bun add posthog-node react-email
+bun add posthog-node @react-email/render react-email
 ```
 
 </CodeGroup>
@@ -51,7 +51,7 @@ export function Email({ url }: EmailProps) {
 
 ## 3. Send email
 
-Import the email template you just built and use the PostHog SDK to send it. The SDK renders the email into HTML and a plain text version. It needs a [project secret API key](https://posthog.com/docs/workflows/transactional-emails#create-an-api-key) with the transactional email scope.
+Import the email template you just built and use the PostHog SDK to send it. The SDK renders the email into HTML and a plain text version. It needs two credentials from your PostHog project: the project token in `POSTHOG_PROJECT_TOKEN`, and a [project secret API key](https://posthog.com/docs/workflows/transactional-emails#create-an-api-key) with the transactional email scope in `POSTHOG_PROJECT_SECRET_API_KEY`. Without the project token, the SDK is disabled and sends nothing. If your project is in the EU, set `host` to `https://eu.i.posthog.com`.
 
 ```tsx
 import { PostHog } from "posthog-node";
