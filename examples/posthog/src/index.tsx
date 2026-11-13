@@ -1,5 +1,4 @@
 import { PostHog } from 'posthog-node';
-import { render, toPlainText } from 'react-email';
 import { Email } from './email';
 
 const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN || '', {
@@ -8,15 +7,12 @@ const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN || '', {
   enableLocalEvaluation: false,
 });
 
-const emailHtml = await render(<Email url="https://example.com" />);
-
 const { data, error } = await posthog.emails.send({
   from: 'you@example.com',
   to: 'user@gmail.com',
   subject: 'hello world',
   templateKey: 'hello-world',
-  html: emailHtml,
-  text: toPlainText(emailHtml),
+  react: <Email url="https://example.com" />,
 });
 
 await posthog.shutdown();
