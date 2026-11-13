@@ -1,0 +1,92 @@
+---
+title: "Send email using PostHog"
+sidebarTitle: "PostHog"
+description: "Learn how to send an email using React Email and the PostHog Node.js SDK."
+"og:image": "https://react.email/static/covers/react-email.png"
+---
+
+## 1. Install dependencies
+
+Get the [react-email](https://www.npmjs.com/package/react-email) package, the [PostHog Node.js SDK](https://www.npmjs.com/package/posthog-node), and [@react-email/render](https://www.npmjs.com/package/@react-email/render). The SDK renders the email with `@react-email/render`, an optional peer dependency, so install it by name.
+
+<CodeGroup>
+
+```sh npm
+npm install posthog-node @react-email/render react-email
+```
+
+```sh yarn
+yarn add posthog-node @react-email/render react-email
+```
+
+```sh pnpm
+pnpm add posthog-node @react-email/render react-email
+```
+
+```sh bun
+bun add posthog-node @react-email/render react-email
+```
+
+</CodeGroup>
+
+## 2. Create an email using React
+
+Start by building your email template in a `.jsx` or `.tsx` file.
+
+```tsx email.tsx
+import { Button, Html } from "react-email";
+
+interface EmailProps {
+  url: string;
+}
+
+export function Email({ url }: EmailProps) {
+  return (
+    <Html lang="en">
+      <Button href={url}>Click me</Button>
+    </Html>
+  );
+}
+```
+
+## 3. Send email
+
+Import the email template you just built and use the PostHog SDK to send it. The SDK renders the email into HTML and a plain text version. It needs two credentials from your PostHog project: the project token from your project settings in `POSTHOG_PROJECT_TOKEN`, and a [project secret API key](https://posthog.com/docs/workflows/transactional-emails#create-an-api-key) with the transactional email scope in `POSTHOG_PROJECT_SECRET_API_KEY`. Without the project token, the SDK is disabled and sends nothing.
+
+```tsx
+import { PostHog } from "posthog-node";
+import { Email } from "./email";
+
+const posthog = new PostHog(process.env.POSTHOG_PROJECT_TOKEN || "", {
+  host: "https://us.i.posthog.com",
+  secretKey: process.env.POSTHOG_PROJECT_SECRET_API_KEY,
+  enableLocalEvaluation: false,
+});
+
+const { data, error } = await posthog.emails.send({
+  from: "you@example.com",
+  to: "user@gmail.com",
+  subject: "hello world",
+  templateKey: "hello-world",
+  react: <Email url="https://example.com" />,
+});
+
+if (error) {
+  throw error;
+}
+
+console.log(data.id);
+```
+
+`templateKey` names the email, so PostHog groups its sends and metrics. The `from` address must be on a domain that your PostHog project verified. If your project is in the EU, set `host` to `https://eu.i.posthog.com`. `enableLocalEvaluation: false` stops the SDK from polling feature flags with the secret key, which a send doesn't need. See the [PostHog React Email guide](https://posthog.com/docs/workflows/transactional-emails/react-email) for retries and errors.
+
+## Try it yourself
+
+<Card
+  title="PostHog example"
+  icon="arrow-up-right-from-square"
+  iconType="duotone"
+  href="https://github.com/resend/react-email/tree/main/examples/posthog"
+>
+  See the full source code.
+</Card>

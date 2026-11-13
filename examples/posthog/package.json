@@ -1,0 +1,29 @@
+{
+  "name": "react-email-with-posthog",
+  "license": "MIT",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsdown src/index.tsx --format esm --target node20",
+    "dev": "tsdown src/index.tsx --format esm --target node20 --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@react-email/render": "2.3.1",
+    "posthog-node": "5.71.0",
+    "react-email": "6.0.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.14",
+    "tsdown": "0.21.9",
+    "typescript": "5.9.3"
+  }
+}
